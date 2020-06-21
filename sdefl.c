@@ -6,7 +6,7 @@
 #define SDEFL_ZLIB_HDR      (0x01)
 
 struct sdefl_match {int off, len;};
-#define sdefl_npow2(n) (1<<(sdefl_ilog2(n-1)+1))
+#define sdefl_npow2(n) (1<<(sdefl_ilog2((n)-1)+1))
 static const unsigned char sdefl_mirror[256] = {
     #define R2(n) n, n + 128, n + 64, n + 192
     #define R4(n) R2(n), R2(n + 32), R2(n + 16), R2(n + 48)
