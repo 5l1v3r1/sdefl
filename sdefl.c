@@ -6,6 +6,7 @@
 #define SDEFL_ZLIB_HDR      (0x01)
 
 struct sdefl_match {int off, len;};
+#define sdefl_npow2(n) (1<<(sdefl_ilog2(n-1)+1))
 static const unsigned char sdefl_mirror[256] = {
     #define R2(n) n, n + 128, n + 64, n + 192
     #define R4(n) R2(n), R2(n + 32), R2(n + 16), R2(n + 48)
@@ -40,17 +41,6 @@ sdefl_adler32(unsigned adler32, const unsigned char *in, int in_len)
         in_len -= blk_len;
         blk_len = 5552;
     } return (unsigned)(s2 << 16) + (unsigned)s1;
-}
-static int
-sdefl_npow2(int n)
-{
-    n--;
-    n |= n >> 1;
-    n |= n >> 2;
-    n |= n >> 4;
-    n |= n >> 8;
-    n |= n >> 16;
-    return (int)++n;
 }
 static int
 sdefl_ilog2(int n)
