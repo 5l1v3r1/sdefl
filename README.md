@@ -17,7 +17,7 @@ ratio to some of the newer algorithms.
     - Inflate ~3.6 KB (~2.2KB compressed)
 
 ## Usage
-For deflating add sdefl(.h+.c) into your project and include `sdefl.h`. To actually
+For deflating add sdefl(h)[.h+.c] into your project and include `sdefl.h`. To actually
 compress memory first call `sdefl_bound` to calculate the maximum number of compressed
 output and allocate an compress output memory buffer and pass it along with your
 to compress input data and a compression level between `SDEFL_LVL_MIN` and
@@ -29,6 +29,43 @@ your compressed block along with its size and an allocated output buffer
 with size of the uncompressed block.
 
 ## Benchmark
+
+### SDEFLH
+| Compressor name         | Compression| Decompress.| Compr. size | Ratio |
+| ---------------         | -----------| -----------| ----------- | ----- |
+| sdeflh 1.0 -0           |   115 MB/s |    94 MB/s |    46489930 | 40.00 |
+| sdeflh 1.0 -1           |   102 MB/s |    96 MB/s |    45291608 | 38.93 |
+| sdeflh 1.0 -5           |    56 MB/s |   100 MB/s |    43983562 | 36.57 |
+| sdeflh 1.0 -8           |    45 MB/s |   100 MB/s |    43914863 | 36.52 |
+| libdeflate 1.3 -1       |   147 MB/s |   667 MB/s |    39597378 | 39.60 |
+| libdeflate 1.3 -6       |    69 MB/s |   689 MB/s |    36648318 | 36.65 |
+| libdeflate 1.3 -9       |    13 MB/s |   672 MB/s |    35197141 | 35.20 |
+| libdeflate 1.3 -12      |  8.13 MB/s |   670 MB/s |    35100568 | 35.10 |
+| zlib 1.2.11 -1          |    72 MB/s |   307 MB/s |    42298774 | 42.30 |
+| zlib 1.2.11 -6          |    24 MB/s |   313 MB/s |    36548921 | 36.55 |
+| zlib 1.2.11 -9          |    20 MB/s |   314 MB/s |    36475792 | 36.48 |
+| miniz 1.0 -1            |   122 MB/s |   208 MB/s |    48510028 | 48.51 |
+| miniz 1.0 -6            |    27 MB/s |   260 MB/s |    36513697 | 36.51 |
+| miniz 1.0 -9            |    23 MB/s |   261 MB/s |    36460101 | 36.46 |
+
+Results on the [Silesia compression corpus](http://sun.aei.polsl.pl/~sdeor/index.php?page=silesia):
+
+| File    |   Original | `sdefl 0`  	| `sdefl 5` 	| `sdefl 7` |
+| :------ | ---------: | -----------------: | ---------: | ----------: |
+| dickens | 10.192.446 |  4,306,115|  3,883,830|   3,872,395 |
+| mozilla | 51.220.480 | 21,446,457 | 20,190,172 |  20,135,328 |
+| mr      |  9.970.564 | 3,976,467 |  3,800,152 |   3,791,038 |
+| nci     | 33.553.445 | 4,056,751 |  3,118,187 |   3,029,206 |
+| ooffice |  6.152.192 | 3,387,661 |  3,247,680 |   3,242,686 |
+| osdb    | 10.085.684 | 3,937,560 |  3,663,956 |   3,663,922 |
+| reymont |  6.627.202 | 2,311,181 |  1,896,375 |   1,866,021 |
+| samba   | 21.606.400 | 6,426,970 |  5,749,948 |   5,735,605 |
+| sao     |  7.251.944 | 5,574,768 |  5,550,965 |   5,546,685 |
+| webster | 41.458.703 | 14,034,753 | 12,110,193 |  12,042,736 |
+| xml     |  5.345.280 | 922,931|    714,539 |     701,820 |
+| x-ray   |  8.474.240 | 6,389,985 |  6,327,069 |   6,327,069 |
+
+### SDEFL
 | Compressor name         | Compression| Decompress.| Compr. size | Ratio |
 | ---------------         | -----------| -----------| ----------- | ----- |
 | sdefl 1.0 -0            |   115 MB/s |    94 MB/s |    46489930 | 46.49 |

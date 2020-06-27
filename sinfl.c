@@ -63,7 +63,7 @@ sinfl_decode(const unsigned char **in, const unsigned char *end,
 extern int
 sinflate(unsigned char *out, const unsigned char *in, int size)
 {
-    static const char order[] = {16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15};
+    static const unsigned char order[] = {16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15};
     static const short dbase[30+2] = {1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,
         257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577};
     static const unsigned char dbits[30+2] = {0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,
