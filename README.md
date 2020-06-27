@@ -33,10 +33,10 @@ with size of the uncompressed block.
 ### SDEFLH
 | Compressor name         | Compression| Decompress.| Compr. size | Ratio |
 | ---------------         | -----------| -----------| ----------- | ----- |
-| sdeflh 1.0 -0           |   115 MB/s |    94 MB/s |    46489930 | 40.00 |
-| sdeflh 1.0 -1           |   102 MB/s |    96 MB/s |    45291608 | 38.93 |
-| sdeflh 1.0 -5           |    56 MB/s |   100 MB/s |    43983562 | 36.57 |
-| sdeflh 1.0 -8           |    45 MB/s |   100 MB/s |    43914863 | 36.52 |
+| sdeflh 1.0 -0           |   115 MB/s |    94 MB/s |    40004116 | 40.00 |
+| sdeflh 1.0 -1           |   102 MB/s |    96 MB/s |    38940674 | 38.93 |
+| sdeflh 1.0 -5           |    56 MB/s |   100 MB/s |    36577183 | 36.57 |
+| sdeflh 1.0 -7           |    45 MB/s |   100 MB/s |    36523781 | 36.52 |
 | libdeflate 1.3 -1       |   147 MB/s |   667 MB/s |    39597378 | 39.60 |
 | libdeflate 1.3 -6       |    69 MB/s |   689 MB/s |    36648318 | 36.65 |
 | libdeflate 1.3 -9       |    13 MB/s |   672 MB/s |    35197141 | 35.20 |
