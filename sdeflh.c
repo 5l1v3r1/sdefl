@@ -21,7 +21,7 @@
 
 struct sdefl_match {int off, len;};
 #define sdefl_npow2(n) (1<<(sdefl_ilog2((n)-1)+1))
-#define sdefl_blk_end(dst, s) sdefl_put(dst, s, (int)s->cod.word.lit[SDEFL_EOB], s->cod.len.lit[SDEFL_EOB])
+#define sdefl_blk_end(dst, s) sdefl_put(dst, s, (int)(s)->cod.word.lit[SDEFL_EOB], (s)->cod.len.lit[SDEFL_EOB])
 
 static unsigned
 sdefl_adler32(unsigned adler32, const unsigned char *in, int in_len)
@@ -245,12 +245,10 @@ static void
 sdefl_precode(unsigned *freqs, unsigned *items, unsigned *item_cnt,
     const unsigned char *lens, const unsigned cnt)
 {
-    unsigned run_end;
-    unsigned run_start = 0;
-
     unsigned *at = items;
+    unsigned run_start = 0;
     do {unsigned len = lens[run_start];
-        run_end = run_start;
+        unsigned run_end = run_start;
         do run_end++; while (run_end != cnt && len == lens[run_end]);
         if ((run_end - run_start) >= 4) {
             freqs[len]++;
@@ -273,12 +271,12 @@ sdefl_precode(unsigned *freqs, unsigned *items, unsigned *item_cnt,
     *item_cnt = (unsigned)(at - items);
 }
 static void
-sdefl_blk_begin(unsigned char **dst, struct sdefl *s)
+sdefl_blk_begin(unsigned char **dst, struct sdefl *s, int is_last)
 {
     unsigned i, item_cnt = 0;
+    unsigned codes[SDEFL_PRE_MAX];
     unsigned char lens[SDEFL_PRE_MAX];
     unsigned freqs[SDEFL_PRE_MAX] = {0};
-    unsigned codes[SDEFL_PRE_MAX];
     unsigned items[SDEFL_SYM_MAX + SDEFL_OFF_MAX];
     static const unsigned char perm[SDEFL_PRE_MAX] = {16,17,18,0,8,7,9,6,10,5,11,
         4,12,3,13,2,14,1,15};
@@ -288,7 +286,7 @@ sdefl_blk_begin(unsigned char **dst, struct sdefl *s)
     sdefl_precode(freqs, items, &item_cnt, s->cod.len.lit, SDEFL_SYM_MAX+SDEFL_OFF_MAX);
     sdefl_huff(lens, codes, freqs, SDEFL_PRE_MAX, SDEFL_PRE_CODES);
 
-    sdefl_put(dst, s, 0x00, 1); /* normal block */
+    sdefl_put(dst, s, is_last ? 0x01 : 0x00, 1); /* block */
     sdefl_put(dst, s, 0x02, 2); /* dynamic huffman */
     sdefl_put(dst, s, SDEFL_SYM_MAX - 257, 5);
     sdefl_put(dst, s, SDEFL_OFF_MAX - 1, 5);
@@ -394,7 +392,7 @@ sdefl_compr(struct sdefl *s, unsigned char *out,
         sdefl_put(&q, s, 0x01, 8); /* fast compression */
     }
     do {int blk_end = i + SDEFL_BLK_MAX < in_len ? i + SDEFL_BLK_MAX : in_len;
-        sdefl_blk_begin(&q, s);
+        sdefl_blk_begin(&q, s, blk_end == in_len);
         while (i < blk_end) {
             struct sdefl_match m = {0};
             int max_match = ((in_len-i)>SDEFL_MAX_MATCH) ? SDEFL_MAX_MATCH:(in_len-i);
@@ -424,11 +422,7 @@ sdefl_compr(struct sdefl *s, unsigned char *out,
         sdefl_blk_end(&q, s);
     } while (i < in_len);
 
-    sdefl_put(&q, s, 0x01, 1); /* last block */
-    sdefl_put(&q, s, 0x01, 2); /* static huffman */
-    sdefl_put(&q, s, 0x00, 7); /* end of stream */
     if (s->cnt) sdefl_put(&q, s, 0, 8 - s->cnt);
-
     if (flags & SDEFL_ZLIB_HDR) {
         /* optionally append adler checksum */
         unsigned a = sdefl_adler32(SDEFL_ADLER_INIT, in, in_len);
