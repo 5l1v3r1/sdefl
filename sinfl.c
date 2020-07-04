@@ -26,8 +26,7 @@ sinfl_get(const unsigned char **src, const unsigned char *end,
 static int
 sinfl_build(unsigned *tree, unsigned char *lens, int symcnt)
 {
-    int n, cnt[16], first[16], codes[16];
-    memset(cnt, 0, sizeof(cnt));
+    int n, cnt[16] = {0}, first[16], codes[16];
     cnt[0] = first[0] = codes[0] = 0;
     for (n = 0; n < symcnt; ++n) cnt[lens[n]]++;
     for (n = 1; n <= 15; n++) {
@@ -76,10 +75,9 @@ sinflate(unsigned char *out, const unsigned char *in, int size)
     const unsigned char *e = in + size, *o = out;
     enum sinfl_states {hdr,stored,fixed,dyn,blk};
     enum sinfl_states state = hdr;
-    struct sinfl s;
+    struct sinfl s = {0};
     int last = 0;
 
-    memset(&s, 0, sizeof(s));
     sinfl_get(&in,e,&s,0); /* buffer input */
     while (in < e || s.bitcnt) {
         switch (state) {

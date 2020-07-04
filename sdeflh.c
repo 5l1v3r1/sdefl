@@ -60,7 +60,7 @@ sdefl_ilog2(int n)
     _BitScanReverse(&msbp, (unsignd long)n);
     return (int)msbp;
 #elif defined(__GNUC__) || defined(__clang__)
-    return (int)sizeof(unsigned long)*CHAR_BIT-1-__builtin_clzl((unsigned long)n);
+    return n ? (int)sizeof(unsigned long)*CHAR_BIT-1-__builtin_clzl((unsigned long)n):0;
 #else
     #define lt(n) n,n,n,n, n,n,n,n, n,n,n,n ,n,n,n,n
     static const char tbl[256] = {0,0,1,1,2,2,2,2,3,3,3,3,
@@ -77,7 +77,7 @@ static unsigned
 sdefl_uload32(const void *p)
 {
     /* hopefully will be optimized to an unaligned read */
-    unsigned int n = 0;
+    unsigned n = 0;
     memcpy(&n, p, sizeof(n));
     return n;
 }
