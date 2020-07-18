@@ -8,6 +8,34 @@ static const unsigned char sinfl_mirror[256] = {
     #define R6(n) R4(n), R4(n +  8), R4(n +  4), R4(n + 12)
     R6(0), R6(2), R6(1), R6(3),
 };
+static unsigned
+sinfl_adler32(unsigned adler32, const unsigned char *in, int in_len)
+{
+    const unsigned ADLER_MOD = 65521;
+    unsigned s1 = adler32 & 0xffff;
+    unsigned s2 = adler32 >> 16;
+    unsigned blk_len, i;
+
+    blk_len = in_len % 5552;
+    while (in_len) {
+        for (i=0; i + 7 < blk_len; i += 8) {
+            s1 += in[0]; s2 += s1;
+            s1 += in[1]; s2 += s1;
+            s1 += in[2]; s2 += s1;
+            s1 += in[3]; s2 += s1;
+            s1 += in[4]; s2 += s1;
+            s1 += in[5]; s2 += s1;
+            s1 += in[6]; s2 += s1;
+            s1 += in[7]; s2 += s1;
+            in += 8;
+        }
+        for (; i < blk_len; ++i)
+            s1 += *in++, s2 += s1;
+        s1 %= ADLER_MOD; s2 %= ADLER_MOD;
+        in_len -= blk_len;
+        blk_len = 5552;
+    } return (unsigned)(s2 << 16) + (unsigned)s1;
+}
 static int
 sinfl_get(const unsigned char **src, const unsigned char *end,
     struct sinfl *s, int n)
@@ -156,5 +184,16 @@ sinflate(unsigned char *out, const unsigned char *in, int size)
             } else *out++ = (unsigned char)sym;
         } break;}
     } return (int)(out-o);
+}
+extern int
+zsinflate(unsigned char *out, const unsigned char *in, int size)
+{
+    if (size >= 6) {
+        const unsigned char *eob = in + size - 4;
+        int n = sinflate(out, in + 2u, size);
+        unsigned a = sinfl_adler32(1u, out, n);
+        unsigned h = eob[0] << 24 | eob[1] << 16 | eob[2] << 8 | eob[3] << 0;
+        return a == h ? n : -1;
+    } else return -1;
 }
 

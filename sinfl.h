@@ -9,6 +9,7 @@ struct sinfl {
     int tlit, tdist, tlen;
 };
 extern int sinflate(unsigned char *out, const unsigned char *in, int size);
+extern int zsinflate(unsigned char *out, const unsigned char *in, int size);
 
 #endif /* SINFL_H_INCLUDED */
 
